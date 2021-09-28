@@ -30,6 +30,9 @@ def test_get_assignments_invalid_student(client, h_invalid_student):
     )
 
     assert response.status_code == 400
+    data = response.json
+
+    assert data['error'] == "FyleError"
 
 def test_get_assignments_teacher_2(client, h_teacher_2):
     """
