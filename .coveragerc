@@ -4,3 +4,5 @@ omit =
     *__pycache__/*
     *.pytest_cache/*
     *tests/*
+    */site-packages/*
+    */dist-packages/*
