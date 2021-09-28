@@ -1,8 +1,10 @@
+from core.models.students import Student
 from flask import Blueprint
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
 from core.models.assignments import Assignment
+from core.libs import assertions
 
 from .schema import AssignmentSchema, AssignmentSubmitSchema
 student_assignments_resources = Blueprint('student_assignments_resources', __name__)
@@ -12,6 +14,9 @@ student_assignments_resources = Blueprint('student_assignments_resources', __nam
 @decorators.auth_principal
 def list_assignments(p):
     """Returns list of assignments"""
+    current_student = Student.get_by_user_id(p.user_id)
+    assertions.assert_valid(current_student is not None and
+        current_student.id == p.student_id, 'Student does not exist')
     students_assignments = Assignment.get_assignments_by_student(p.student_id)
     students_assignments_dump = AssignmentSchema().dump(students_assignments, many=True)
     return APIResponse.respond(data=students_assignments_dump)
@@ -22,6 +27,9 @@ def list_assignments(p):
 @decorators.auth_principal
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
+    current_student = Student.get_by_user_id(p.user_id)
+    assertions.assert_valid(current_student is not None and
+        current_student.id == p.student_id, 'Student does not exist')
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
 
@@ -36,6 +44,9 @@ def upsert_assignment(p, incoming_payload):
 @decorators.auth_principal
 def submit_assignment(p, incoming_payload):
     """Submit an assignment"""
+    current_student = Student.get_by_user_id(p.user_id)
+    assertions.assert_valid(current_student is not None and
+        current_student.id == p.student_id, 'Student does not exist')
     submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
 
     submitted_assignment = Assignment.submit(

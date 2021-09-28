@@ -31,7 +31,10 @@ def test_get_assignments_invalid_teacher(client, h_invalid_teacher):
         headers=h_invalid_teacher
     )
 
-    assert response.status_code == 403
+    assert response.status_code == 400
+    data = response.json
+
+    assert data['error'] == 'FyleError'
 
 
 def test_get_assignments_student_1(client, h_student_1):
